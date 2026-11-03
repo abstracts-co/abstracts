@@ -36,7 +36,7 @@
     appearance: none; border: 0; cursor: pointer;
     height: 38px; min-width: 38px; padding: 0 14px; border-radius: 999px;
     display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-    font: 500 13px/1 "IBM Plex Mono", ui-monospace, monospace; color: var(--ink); text-decoration: none;
+    font: 500 13px/1 "IBM Plex Mono", ui-monospace, monospace; color: var(--ink); text-decoration: none; white-space: nowrap;
     background: rgba(255, 253, 248, 0.78);
     box-shadow: 0 1px 0 rgba(255,255,255,.7) inset, 0 1px 2px rgba(31,36,54,.12), 0 6px 18px -8px rgba(31,36,54,.35);
     -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
@@ -71,7 +71,7 @@
   .ready .hint { opacity: 1; }
   .ready .hint.gone { opacity: 0; }
   .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-  @media (max-width: 419px) { .bar { gap: 6px; } .dots button { width: 14px; } .btn { padding: 0 11px; } .hint { font-size: 12px; } }
+  @media (max-width: 419px) { .bar { gap: 6px; } .dots button { width: 14px; } .btn { padding: 0 11px; } .hint { font-size: 12px; } .bar:has(#again:not([hidden])) .dots { display: none; } }
   @media (prefers-reduced-motion: reduce) { .btn, .dots button::after, .hint { transition: none; } }
 </style>
 <script type="importmap">
@@ -96,7 +96,7 @@
     <button class="btn" id="again" type="button" hidden>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>Read again
     </button>
-    <a class="btn btn--primary" id="join" href="https://abstracts.co/a/abstracts" target="_blank" rel="noopener" hidden>Join a/abstracts</a>
+    <a class="btn btn--primary" id="join" href="https://abstracts.co/a/abstracts" target="_blank" rel="noopener" hidden>Join</a>
   </nav>
   <p class="sr" id="live" aria-live="polite"></p>
   <section class="sr">

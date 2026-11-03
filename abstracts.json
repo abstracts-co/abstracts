@@ -6,5 +6,6 @@
   "roles": [],
   "categories": [],
   "aboutArtifact": "about",
-  "avatar": "logo.png"
+  "avatar": "logo.png",
+  "cover": "cover.webp"
 }
