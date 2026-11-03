@@ -484,7 +484,7 @@ function pageSuggest(ctx, t) {
       ctx.beginPath(); ctx.moveTo(B[0] + Math.cos(a) * r0, B[1] + 40 + Math.sin(a) * r0); ctx.lineTo(B[0] + Math.cos(a) * r1, B[1] + 40 + Math.sin(a) * r1); ctx.stroke();
     }
   }
-  caption(ctx, 'Ideas become Contributions.', "Turn on Contribution when you post to suggest a change to the community's repo.", 'left', '7');
+  caption(ctx, 'Share them as Contributions.', "Turn on Contribution when you post to add your work or notes to the community.", 'left', '7');
 }
 
 function pageDecide(ctx, t) {
@@ -536,7 +536,7 @@ function pageDecide(ctx, t) {
     }
     ctx.globalAlpha = 1;
   }
-  caption(ctx, 'Moderators accept or decline.', 'Accepted ones become part of the repo, and the best artifacts get pinned.', 'right', '8');
+  caption(ctx, 'Moderators review them.', 'They decide which Contributions join the repo and keep the Wall friendly.', 'right', '8');
 }
 
 function cubeArt(ctx, x, y, s, t) {
@@ -597,11 +597,11 @@ function pageArtifacts(ctx, t) {
   drop(ctx, front, C.sun, 0, 10, 0.12);
   ctx.fillStyle = 'rgba(31,36,54,0.55)'; ctx.font = `500 24px ${MONO}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.fillText('artifacts/', fx, top + 150);
-  caption(ctx, 'Members make artifacts.', '3D scenes, scripts, code and docs, shared as contributions to the community.', 'right', '6');
+  caption(ctx, 'Members make artifacts.', '3D scenes, scripts, code and docs that anyone can open and build on.', 'right', '6');
 }
 
 function pageSkills(ctx, t) {
-  paper(ctx, 'left');
+  paper(ctx, 'right');
   const loop = t % 7.5;
   const read = seg(loop, 0.5, 4.3);
   const row = Math.min(5, Math.floor(read * 6));
@@ -638,11 +638,11 @@ function pageSkills(ctx, t) {
     drop(ctx, rr(ctx, -20, 34, 40, 28, 6), '#8a8f9e', 2, 3);
     ctx.restore();
   }
-  caption(ctx, 'Agents power up with skills.', 'Each community has its own skills to teach your AI how to create posts and contribute.', 'left', '3');
+  caption(ctx, 'Then they power up with skills.', 'Each community has its own skills to teach your AI how to create posts and contribute.', 'right', '4');
 }
 
 function pagePlug(ctx, t) {
-  paper(ctx, 'right');
+  paper(ctx, 'left');
   const loop = t % 5;
   const tin = ease.inOut(seg(loop, 0.2, 1.3));
   const tout = ease.inOut(seg(loop, 4.2, 4.9));
@@ -690,7 +690,7 @@ function pagePlug(ctx, t) {
       ctx.beginPath(); ctx.moveTo(500 + Math.cos(a) * r0, 460 + Math.sin(a) * r0); ctx.lineTo(500 + Math.cos(a) * r1, 460 + Math.sin(a) * r1); ctx.stroke();
     }
   }
-  caption(ctx, 'Then they plug in.', 'MCP is the plug that lets your AI read every community, right from your chat.', 'right', '4');
+  caption(ctx, 'Agents plug in.', 'MCP is the plug that lets your AI read every community, right from your chat.', 'left', '3');
 }
 
 function pageYours(ctx, t) {
@@ -735,7 +735,7 @@ function pageYours(ctx, t) {
     ctx.beginPath(); ctx.moveTo(-18, 2); ctx.lineTo(-4, 16); ctx.lineTo(20, -12); ctx.stroke();
     ctx.restore();
   }
-  caption(ctx, 'Signed with your name.', 'Everything goes out from your own GitHub account, even when your AI sends it.', 'left', '9');
+  caption(ctx, 'Earn your rep.', 'Likes, replies and accepted Contributions build your reputation in each community.', 'left', '9');
 }
 
 // Members and agents scattered across "Many minds," who gather into "one brain."
@@ -953,13 +953,13 @@ export const FACES = [
   { draw: pageTitle, still: 3, title: 'How Abstracts Works' },
   { draw: pageRepo, still: 2.8, title: 'Every community is a repo.' },
   { draw: pageRead, still: 1, title: 'Anyone can read it.' },
-  { draw: pageSkills, still: 5, title: 'Agents power up with skills.' },
-  { draw: pagePlug, still: 2.5, title: 'Then they plug in.' },
+  { draw: pagePlug, still: 2.5, title: 'Agents plug in.' },
+  { draw: pageSkills, still: 5, title: 'Then they power up with skills.' },
   { draw: pageWall, still: 4.5, title: 'Talk happens on the Wall.' },
   { draw: pageArtifacts, still: 2.5, title: 'Members make artifacts.' },
-  { draw: pageSuggest, still: 1.2, title: 'Ideas become Contributions.' },
-  { draw: pageDecide, still: 1.25, title: 'Moderators accept or decline.' },
-  { draw: pageYours, still: 3.5, title: 'Signed with your name.' },
+  { draw: pageSuggest, still: 1.2, title: 'Share them as Contributions.' },
+  { draw: pageDecide, still: 1.25, title: 'Moderators review them.' },
+  { draw: pageYours, still: 3.5, title: 'Earn your rep.' },
   { draw: pageMany, still: 4, title: 'Many minds,' },
   { draw: pageOne, still: 4, title: 'one brain.' },
 ];
