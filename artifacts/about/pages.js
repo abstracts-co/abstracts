@@ -852,6 +852,73 @@ function pageOne(ctx, t) {
   caption(ctx, 'one brain.', "thinking together, in the open. That's Abstracts.", 'left', '11');
 }
 
+/* ---------- the guestbook ---------- */
+
+// Entries come from abstracts.co through the artifact bridge (guest.js). x runs across both guestbook pages, 0 to 0.5 on
+// the first and 0.5 to 1 on the second; y runs down the page. Each page caches its entries in a layer.
+export const GUEST = { entries: [], status: 'loading', version: 0, boxes: [[], []], layers: [null, null], drawn: [-1, -1] };
+// Where people can sign, in the 768×1024 design space: the first page keeps its caption clear.
+export const GUEST_AREA = [{ x0: 40, x1: 728, y0: 48, y1: 772 }, { x0: 40, x1: 728, y0: 48, y1: 950 }];
+
+const idSeed = id => [...id].reduce((h, ch) => Math.imul(h ^ ch.charCodeAt(0), 16777619), 2166136261);
+
+function guestEntry(g, e, page, s) {
+  const x = (e.x - page * 0.5) * 2 * 768, y = e.y * 1024;
+  const r = rng(idSeed(e.id));
+  let w, h;
+  g.save();
+  g.translate(x, y);
+  g.rotate((r() - 0.5) * 0.16);
+  if (e.text) {
+    g.font = `italic 500 ${Math.round(30 * s)}px ${SERIF}`;
+    w = Math.min(g.measureText(e.text).width, 330 * s) + 30 * s; h = 50 * s;
+    drop(g, rr(g, -w / 2, -h / 2, w, h, h / 2), '#fffaf0', 2 * s, 3 * s, 0.16);
+    g.strokeStyle = 'rgba(31,36,54,0.16)'; g.lineWidth = 1.5; g.stroke();
+    g.fillStyle = C.ink; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText(e.text, 0, 2 * s, w - 26 * s);
+  } else {
+    w = h = 128 * s;
+    g.translate(-w / 2, -h / 2);
+    g.lineCap = g.lineJoin = 'round';
+    for (const st of e.strokes) {
+      g.strokeStyle = st.color; g.fillStyle = st.color; g.lineWidth = st.width * w / 200;
+      if (st.points.length === 2) { g.beginPath(); g.arc(st.points[0] * w, st.points[1] * h, g.lineWidth / 2, 0, TAU); g.fill(); continue; }
+      g.beginPath();
+      for (let i = 0; i < st.points.length; i += 2) g.lineTo(st.points[i] * w, st.points[i + 1] * h);
+      g.stroke();
+    }
+  }
+  g.restore();
+  return { x0: x - w / 2, y0: y - h / 2, x1: x + w / 2, y1: y + h / 2, e };
+}
+
+function guestLayer(page) {
+  if (GUEST.drawn[page] === GUEST.version) return GUEST.layers[page];
+  const c = GUEST.layers[page] || (GUEST.layers[page] = Object.assign(document.createElement('canvas'), { width: 768, height: 1024 }));
+  const g = c.getContext('2d');
+  g.clearRect(0, 0, 768, 1024);
+  const mine = GUEST.entries.filter(e => (e.x >= 0.5 ? 1 : 0) === page);
+  // Entries shrink as a page fills, down to about half size.
+  const s = clamp(1.15 - mine.length / 140, 0.5, 1);
+  GUEST.boxes[page] = mine.map(e => guestEntry(g, e, page, s));
+  GUEST.drawn[page] = GUEST.version;
+  return c;
+}
+
+function guestPage(page) {
+  return ctx => {
+    paper(ctx, page ? 'left' : 'right');
+    ctx.save();
+    ctx.globalAlpha = 0.14;
+    brainBlob(ctx, 384, 420, 1.2, 'rgba(242,161,180,0.6)');
+    network(ctx, 384, 420, 1.2, 0, { pulses: false });
+    ctx.restore();
+    ctx.drawImage(guestLayer(page), 0, 0);
+    if (page) caption(ctx, '', '', 'left', '13');
+    else caption(ctx, 'Sign the guestbook.', GUEST.status === 'outside' ? 'Open on abstracts.co to sign.' : 'Tap any empty spot to add your name or a drawing.', 'right', '12');
+  };
+}
+
 /* ---------- endpapers and cover ---------- */
 
 function pattern(ctx, w, h, seed) {
@@ -962,6 +1029,8 @@ export const FACES = [
   { draw: pageYours, still: 3.5, title: 'Earn your rep.' },
   { draw: pageMany, still: 4, title: 'Many minds,' },
   { draw: pageOne, still: 4, title: 'one brain.' },
+  { draw: guestPage(0), still: 0, title: 'Sign the guestbook.', guest: 0 },
+  { draw: guestPage(1), still: 0, title: 'More room to sign.', guest: 1 },
 ];
 export const END_FRONT = endFront;
 export const END_BACK = endBack;

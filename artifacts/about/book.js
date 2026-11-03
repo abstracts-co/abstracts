@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-import { FACES, END_FRONT, END_BACK, PX_W, PX_H, paint, drawCoverMaps, drawClothMaps } from './pages.js';
+import { FACES, END_FRONT, END_BACK, PX_W, PX_H, GUEST, GUEST_AREA, paint, drawCoverMaps, drawClothMaps } from './pages.js';
+import { startGuest, openEditor, editing, showTip, hideTip } from './guest.js';
 
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const stage = document.getElementById('stage');
@@ -259,6 +260,7 @@ for (let i = 1; i < FACES.length - 1; i += 2) LABELS.push(`${FACES[i].title} ${F
 LABELS.push(`${FACES[FACES.length - 1].title} Come build with us.`);
 
 function go(dir) {
+  if (editing()) return false;
   const i = dir > 0 ? nextLeaf() : prevLeaf();
   if (i < 0) return false;
   turn(leaves[i], dir > 0 ? 1 : 0);
@@ -274,6 +276,7 @@ function go(dir) {
 let narrow = false, focus = 1, camX = 0;
 const leftReadable = () => spread() >= 2;
 function step(dir) {
+  if (editing()) return false;
   const s = spread();
   if (narrow && s > 0) {
     if (dir > 0 && focus === -1) { focus = 1; interacted(); syncUI(); wake(); return true; }
@@ -283,6 +286,7 @@ function step(dir) {
 }
 
 function restart() {
+  if (editing()) return;
   const turned = leaves.map((l, i) => i).filter(i => leaves[i].target === 1).reverse();
   focus = 1;
   turned.forEach((i, n) => setTimeout(() => { turn(leaves[i], 0); leaves[i].curl = -1; syncUI(); }, n * (reduced ? 0 : 110)));
@@ -321,6 +325,7 @@ ui.prev.addEventListener('click', () => step(-1));
 ui.next.addEventListener('click', () => step(1));
 ui.again.addEventListener('click', restart);
 addEventListener('keydown', e => {
+  if (editing()) return;
   if (e.key === 'ArrowRight' || e.key === 'PageDown') { step(1); e.preventDefault(); }
   if (e.key === 'ArrowLeft' || e.key === 'PageUp') { step(-1); e.preventDefault(); }
 });
@@ -335,8 +340,37 @@ function screenX(x) {
   return r.left + (v3.x + 1) / 2 * r.width;
 }
 
+/* ---------- the guestbook: a tap on an empty spot signs, a tap on an entry says who ---------- */
+const GUEST_FACE = FACES.findIndex(f => f.guest === 0);
+const guestLeaf = leaves[GUEST_FACE / 2 + 1];
+const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+// The point on a guestbook page under the pointer, in its 768×1024 design space, while that page lies still and open.
+function guestSpot(e) {
+  if (guestLeaf.anim || drag?.leaf >= 0) return null;
+  const r = canvas.getBoundingClientRect();
+  ndc.set((e.clientX - r.left) / r.width * 2 - 1, -(e.clientY - r.top) / r.height * 2 + 1);
+  ray.setFromCamera(ndc, camera);
+  const hit = ray.intersectObjects(guestLeaf.object.children, false)[0];
+  if (!hit) return null;
+  const page = hit.object.material.side === THREE.BackSide ? 1 : 0;
+  if (!faces[GUEST_FACE + page].visible) return null;
+  const px = (page ? 1 - hit.uv.x : hit.uv.x) * 768, py = (1 - hit.uv.y) * 1024, a = GUEST_AREA[page];
+  if (px < a.x0 || px > a.x1 || py < a.y0 || py > a.y1) return null;
+  const box = GUEST.boxes[page].find(b => px >= b.x0 && px <= b.x1 && py >= b.y0 && py <= b.y1);
+  return { page, box, x: +(page * 0.5 + px / 768 / 2).toFixed(3), y: +(py / 1024).toFixed(3) };
+}
+function guestTap(e) {
+  const at = guestSpot(e);
+  if (!at) return false;
+  if (at.box) showTip(`u/${at.box.e.author.handle}`, e.clientX, e.clientY);
+  else if (GUEST.status === 'ready') { hideTip(); openEditor(at); }
+  else showTip(GUEST.status === 'outside' ? 'Open on abstracts.co to sign' : 'One moment…', e.clientX, e.clientY);
+  interacted();
+  return true;
+}
 canvas.addEventListener('pointerdown', e => {
-  if (e.button !== 0) return;
+  hideTip();
+  if (e.button !== 0 || editing()) return;
   drag = { x: e.clientX, y: e.clientY, id: e.pointerId, leaf: -1, dir: 0, moved: false, hist: [[performance.now(), e.clientX]] };
 });
 canvas.addEventListener('pointermove', e => {
@@ -366,7 +400,16 @@ canvas.addEventListener('pointermove', e => {
     }
     return;
   }
-  if (e.pointerType !== 'mouse' || narrow) return;
+  if (e.pointerType !== 'mouse' || editing()) return;
+  const at = (faces[GUEST_FACE].visible || faces[GUEST_FACE + 1].visible) && guestSpot(e);
+  if (at) {
+    if (at.box) showTip(`u/${at.box.e.author.handle}`, e.clientX, e.clientY); else hideTip();
+    canvas.style.cursor = at.box ? 'default' : GUEST.status === 'ready' ? 'crosshair' : 'default';
+    peek.goal = 0;
+    return;
+  }
+  hideTip();
+  if (narrow) return;
   // hover: lift the corner of the page under the pointer
   const sx = screenX(0), page = Math.abs(screenX(PW) - sx);
   const rel = (e.clientX - sx) / page;
@@ -382,7 +425,7 @@ canvas.addEventListener('pointermove', e => {
   peek.goal = leaf === -1 ? 0 : goal;
   canvas.style.cursor = yIn && Math.abs(rel) < 1.05 ? 'pointer' : 'default';
 });
-canvas.addEventListener('pointerleave', () => { peek.goal = 0; });
+canvas.addEventListener('pointerleave', () => { peek.goal = 0; hideTip(); });
 
 function endDrag(e) {
   if (!drag || e.pointerId !== drag.id) return;
@@ -400,7 +443,7 @@ function endDrag(e) {
     syncUI();
     return;
   }
-  if (d.moved) return;
+  if (d.moved || guestTap(e)) return;
   // a click: right side forward, left side back
   const r = canvas.getBoundingClientRect();
   const sx = narrow ? r.left + r.width / 2 : screenX(0);
@@ -561,4 +604,8 @@ paintStatic();
 syncUI();
 layout();
 wake();
+startGuest(() => {
+  faces[GUEST_FACE].dirty = faces[GUEST_FACE + 1].dirty = true;
+  wake();
+});
 fontsReady().then(() => { paintStatic(); wake(); document.documentElement.classList.add('ready'); });
