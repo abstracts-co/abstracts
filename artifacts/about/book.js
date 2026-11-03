@@ -6,6 +6,18 @@ import { startGuest, openEditor, editing, showTip, hideTip } from './guest.js';
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const stage = document.getElementById('stage');
 const canvas = document.getElementById('book');
+let layoutMode = parent === window ? 'viewport' : 'content';
+addEventListener('message', event => {
+  if (event.source !== parent || parent === window) return;
+  const mode = event.data?.abstractsLayout;
+  if (mode !== 'content' && mode !== 'viewport') return;
+  layoutMode = mode;
+  document.documentElement.dataset.layout = mode;
+  if (mode === 'viewport') parent.postMessage({ abstractsLayout: 'viewport' }, '*');
+  else postHeight();
+});
+const requestLayout = () => { if (parent !== window) parent.postMessage({ abstractsLayout: 'request' }, '*'); };
+requestLayout();
 const ui = {
   prev: document.getElementById('prev'),
   next: document.getElementById('next'),
@@ -497,11 +509,14 @@ function layout() {
 }
 
 function postHeight() {
-  parent.postMessage({ abstractsHeight: Math.ceil(document.body.getBoundingClientRect().height) }, '*');
+  if (parent !== window && layoutMode === 'content') {
+    const width = stage.getBoundingClientRect().width;
+    parent.postMessage({ abstractsHeight: Math.ceil(width * (width < 640 ? 4 / 3 : 10 / 16)) }, '*');
+  }
 }
 new ResizeObserver(layout).observe(stage);
 addEventListener('resize', postHeight);
-addEventListener('load', postHeight);
+addEventListener('load', () => { requestLayout(); postHeight(); });
 
 /* ---------- animation ---------- */
 // Turns are timed tweens on the wall clock, so they land exactly flat at any frame rate.
