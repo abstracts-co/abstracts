@@ -896,7 +896,7 @@ function endFront(ctx) {
 function endBack(ctx) {
   pattern(ctx, 768, 1024, 23);
   gutter(ctx, 'right', 0.3);
-  plate(ctx, 384, 512, 520, 300, 'Come build with us', 'a/abstracts', 'abstracts.co/a/abstracts');
+  plate(ctx, 384, 512, 520, 300, 'Come build with us', 'Abstracts', 'abstracts.co');
 }
 
 // Foil art on the cover, drawn in one colour so it can double as a mask.
