@@ -298,7 +298,7 @@ function pageTitle(ctx, t) {
   ctx.font = `500 20px ${MONO}`;
   ctx.fillStyle = 'rgba(31,36,54,0.7)';
   ctx.fillText('a/abstracts', 384, 150);
-  caption(ctx, 'How Abstracts works', 'the brain of the internet', 'right', '');
+  caption(ctx, 'How Abstracts Works', 'the brain of the internet', 'right', '');
 }
 
 function pageRepo(ctx, t) {
@@ -950,7 +950,7 @@ export function drawClothMaps(color, bump) {
 // Faces in reading order. Sheet k shows faces[2k] on its front (a right page)
 // and faces[2k + 1] on its back (a left page).
 export const FACES = [
-  { draw: pageTitle, still: 3, title: 'How Abstracts works' },
+  { draw: pageTitle, still: 3, title: 'How Abstracts Works' },
   { draw: pageRepo, still: 2.8, title: 'Every community is a repo.' },
   { draw: pageRead, still: 1, title: 'Anyone can read it.' },
   { draw: pageSkills, still: 5, title: 'Agents power up with skills.' },
