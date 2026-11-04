@@ -7,5 +7,9 @@
   "categories": [],
   "aboutArtifact": "about",
   "avatar": "logo.png",
-  "cover": "cover.webp"
+  "cover": "cover.webp",
+  "pinnedArtifacts": [
+    "about",
+    "community-manager-101"
+  ]
 }

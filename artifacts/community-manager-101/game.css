@@ -1,0 +1,99 @@
+/* Community Manager 101: a card game on the table; the real Abstracts screens appear in a phone. */
+:root { color-scheme: light; }
+.kicker:empty, .note:empty { display: none; }
+.panel:has(.game), .panel:has(.gallery) { background: transparent; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; overflow: visible; }
+.panel:has(.game) { width: min(40%, 360px); }
+.panel:has(.gallery) { width: min(62%, 600px); }
+.panel:has(.sitcard) .title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.stage.narrow .panel:has(.game), .stage.narrow .panel:has(.gallery) { width: auto; margin-top: -6px; }
+.panel svg { flex: none; }
+.game { display: flex; flex-direction: column; gap: 14px; align-items: center; }
+.game > .btn--big { gap: 8px; }
+.game > .btn--big svg, .btn--next svg { width: 20px; height: 20px; }
+:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; }
+
+/* round progress */
+.pips { list-style: none; display: flex; gap: 6px; margin: 0; padding: 0; }
+.pips li { width: 20px; height: 20px; color: rgba(31,36,54,.18); }
+.pips li svg { width: 100%; height: 100%; }
+.pips li.is-now { color: rgba(31,36,54,.45); }
+.pips li.is-won { color: #f4b63f; filter: drop-shadow(0 1px 0 rgba(31,36,54,.35)); }
+
+/* the situation card, dealt onto the table */
+.sitcard { position: relative; width: 100%; max-width: 300px; padding: 12px 14px 14px; border-radius: 16px; background: var(--card); transform: rotate(-1.5deg);
+  box-shadow: 0 0 0 1.5px var(--ink) inset, 0 0 0 6px var(--card) , 0 0 0 7.5px rgba(31,36,54,.25), 0 18px 30px -18px rgba(31,36,54,.55); }
+.sitcard__art { display: block; width: 100%; height: 86px; }
+.sitcard p { margin: 6px 0 0; text-align: center; font: 600 19px/1.2 "Fraunces", Georgia, serif; text-wrap: balance; }
+.deal { animation: deal .55s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes deal { from { opacity: 0; transform: translate(60px, -40px) rotate(14deg); } }
+.stamp { position: absolute; right: -10px; top: -12px; display: none; align-items: center; gap: 2px; padding: 6px 9px; border-radius: 999px; background: #f4b63f; color: var(--ink); font: 700 14px/1 "IBM Plex Mono", monospace; transform: rotate(10deg); box-shadow: 0 6px 14px -6px rgba(31,36,54,.5); }
+.stamp svg { width: 15px; height: 15px; }
+.game.is-done .stamp { display: inline-flex; animation: stamp .45s cubic-bezier(.3,1.6,.5,1) both; }
+@keyframes stamp { from { opacity: 0; transform: rotate(10deg) scale(2.2); } }
+
+/* the hand of cards */
+.hand { display: flex; justify-content: center; padding: 8px 6px 4px; }
+.tile { appearance: none; border: 0; cursor: pointer; flex: none; width: 58px; height: 84px; margin: 0 -3px; padding: 8px 3px 6px; border-radius: 10px;
+  display: flex; flex-direction: column; align-items: center; justify-content: space-between; color: var(--ink); background: var(--card);
+  box-shadow: 0 0 0 1.5px var(--ink) inset, 0 8px 14px -8px rgba(31,36,54,.55); font: 600 10px/1.15 "IBM Plex Mono", monospace; text-align: center;
+  transform: translateY(var(--y)) rotate(var(--r)); transition: transform .18s cubic-bezier(.2,.8,.2,1), opacity .2s ease; }
+.tile svg { width: 26px; height: 26px; margin-top: 6px; }
+.tile--soft { background: #fde6df; color: #c2462c; box-shadow: 0 0 0 1.5px #c2462c inset, 0 8px 14px -8px rgba(31,36,54,.55); }
+button.tile:hover, button.tile:focus-visible { transform: translateY(calc(var(--y) - 12px)) rotate(var(--r)); z-index: 1; }
+.tile.is-wrong { opacity: .3; }
+.tile.is-hint { animation: glow 1.1s ease-in-out infinite; z-index: 1; }
+.tile.is-press { transform: translateY(calc(var(--y) - 16px)) rotate(0deg) scale(1.06); background: var(--ink); color: var(--paper); }
+.wobble { animation: wobble .4s ease; }
+@keyframes wobble { 25% { transform: translateY(var(--y)) rotate(calc(var(--r) - 9deg)); } 75% { transform: translateY(var(--y)) rotate(calc(var(--r) + 9deg)); } }
+@keyframes glow { 50% { box-shadow: 0 0 0 1.5px var(--ink) inset, 0 0 0 5px rgba(42,157,143,.5); } }
+.game.is-done .hand { display: none; }
+.hand--deck .tile { cursor: default; }
+
+/* a glimpse of the real screen */
+.reveal { display: flex; align-items: flex-end; gap: 10px; }
+.reveal[hidden] { display: none; }
+.btn--next { width: 48px; height: 48px; padding: 0; flex: none; }
+.phone { margin: 0; width: 240px; padding: 7px; border-radius: 26px; background: #1c1b19; box-shadow: 0 18px 34px -16px rgba(0,0,0,.55); font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif; }
+.phone__url { margin: 2px 26px 6px; padding: 3px 8px; border-radius: 999px; background: #2e2b27; color: #d6cfc2; font-size: 9.5px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.phone__screen { min-height: 170px; padding: 10px; border-radius: 19px; background: #faf8f4; color: #1c1b19; font-size: 12px; line-height: 1.35; display: flex; flex-direction: column; gap: 7px; }
+.phone h4 { margin: 0; font-size: 14px; font-weight: 700; }
+.phone h5 { margin: 4px 0 0; font-size: 11px; font-weight: 700; color: #4a463f; }
+.phone p { margin: 0; }
+.ri { width: 14px; height: 14px; flex: none; color: #6f695f; display: inline-block; }
+.rs-post { padding: 8px; border-radius: 12px; background: #fff; border: 1px solid #e9e4da; display: flex; flex-direction: column; gap: 5px; }
+.rs-head { display: flex; align-items: center; gap: 6px; font-size: 11.5px; }
+.rs-av { width: 18px; height: 18px; border-radius: 99px; }
+.rs-muted { color: #8a847a; }
+.rs-more { margin-left: auto; display: grid; place-items: center; width: 24px; height: 22px; border-radius: 7px; }
+.rs-more.is-open { background: #efeae1; }
+.rs-menu { margin-left: auto; width: 175px; margin-top: -4px; padding: 4px; border-radius: 12px; background: #fff; border: 1px solid #e9e4da; box-shadow: 0 8px 20px -8px rgba(28,27,25,.3); }
+.rs-item { display: flex; align-items: center; gap: 8px; height: 26px; padding: 0 7px; border-radius: 8px; font-size: 12px; }
+.rs-danger, .rs-danger .ri { color: #a23b2a; }
+.rs-row { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+.rs-btn { display: inline-flex; align-items: center; height: 24px; padding: 0 9px; border-radius: 999px; border: 1px solid #d6cfc2; background: #fff; font-size: 11px; font-weight: 600; white-space: nowrap; }
+.rs-field { flex: 1; min-width: 60px; height: 24px; display: flex; align-items: center; padding: 0 7px; border-radius: 7px; border: 1px solid #d6cfc2; background: #fff; font-size: 11px; color: #4a463f; }
+.rs-sel { flex: none; }
+.rs-art { height: 64px; border-radius: 10px; background: radial-gradient(60% 80% at 60% 30%, #f6dc9c, #6fb0e6); }
+.rs-act { display: inline-flex; align-items: center; gap: 4px; padding: 2px 6px; border-radius: 7px; color: #6f695f; font-size: 11px; }
+.rs-acts { gap: 8px; }
+.rs-compose { padding: 7px 9px; border-radius: 10px; border: 1px solid #d6cfc2; background: #fff; color: #4a463f; font-size: 11.5px; }
+.rs-list { display: flex; align-items: center; gap: 8px; font-size: 11.5px; }
+.grow { flex: 1; }
+.is-hl { background: #fbebd9 !important; box-shadow: 0 0 0 2px #d97a1e; color: #8f4c0e !important; animation: hl 1.4s ease-in-out infinite; }
+.is-hl .ri { color: #8f4c0e; }
+@keyframes hl { 50% { box-shadow: 0 0 0 4px rgba(217,122,30,.35); } }
+
+/* the end: a gallery of the real screens */
+.gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px 8px; justify-items: center; }
+.gallery .phone { zoom: .74; }
+.stage.narrow .gallery { grid-template-columns: repeat(2, 1fr); }
+.stage.narrow .gallery .phone { zoom: .68; }
+.cta { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.ghost { position: absolute; left: 0; top: 0; width: 30px; height: 30px; pointer-events: none; z-index: 5; opacity: 0; filter: drop-shadow(0 3px 4px rgba(31,36,54,.35)); }
+.ghost svg { width: 100%; height: 100%; }
+@media (prefers-reduced-motion: reduce) {
+  .tile, .deal, .reveal, .stamp, .game.is-done .stamp, .is-hl, .tile.is-hint, .wobble { transition: none !important; animation: none !important; }
+}
+/* tour captions */
+.cap { position: absolute; z-index: 6; margin: 0; max-width: min(340px, calc(100% - 24px)); padding: 7px 13px; border-radius: 999px; background: var(--ink); color: var(--paper); font: 600 13.5px/1.3 "IBM Plex Mono", monospace; text-align: center; text-wrap: balance; pointer-events: none; box-shadow: 0 10px 22px -12px rgba(31,36,54,.6); white-space: normal; }
+.cap[hidden] { display: none; }
