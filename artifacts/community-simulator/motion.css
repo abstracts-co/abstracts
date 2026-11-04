@@ -1,0 +1,89 @@
+/* motion.css: shared stage for Abstracts explainer artifacts (sibling of the About book). Copy per artifact. */
+:root { --ink: #1f2436; --paper: #f7f1e4; --card: #fffdf8; --teal: #2a9d8f; --muted: rgba(31,36,54,.68); --line: rgba(31,36,54,.14); }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: transparent; }
+body { font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace; color: var(--ink); -webkit-text-size-adjust: 100%; }
+.stage {
+  position: relative; width: 100%; aspect-ratio: 16 / 10; overflow: hidden; border-radius: 18px;
+  background: radial-gradient(120% 90% at 50% 38%, #f4efe6 0%, #e9e1d3 60%, #dcd2c1 100%);
+}
+.view { position: absolute; inset: 0; }
+.view canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: pan-y; outline: none; }
+
+/* Panel: caption + the step's own controls. Left card on wide stages, below the 3D view on narrow ones. */
+.panel {
+  position: absolute; left: 16px; top: 16px; max-height: calc(100% - 88px); width: min(38%, 360px);
+  display: flex; flex-direction: column; gap: 10px; padding: 18px 18px 16px; overflow: auto;
+  background: rgba(255,253,248,.84); border-radius: 16px;
+  box-shadow: 0 1px 0 rgba(255,255,255,.8) inset, 0 1px 2px rgba(31,36,54,.1), 0 16px 40px -22px rgba(31,36,54,.45);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+}
+.panel[hidden] { display: none; }
+.kicker { margin: 0; font: 600 11px/1.3 "IBM Plex Mono", monospace; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.title { margin: 0; font: 600 clamp(20px, 2.4vw, 26px)/1.15 "Fraunces", Georgia, serif; letter-spacing: -.01em; text-wrap: balance; }
+.text { margin: 0; font-size: 14px; line-height: 1.5; text-wrap: pretty; }
+.note { margin: 0; font-size: 13px; line-height: 1.45; color: var(--muted); min-height: 1.45em; }
+.note--ok { color: #1d7a6e; }
+.note:empty { display: none; }
+.note--warn { color: #b44a2f; }
+.fade { animation: fadeUp .45s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.controls { display: flex; flex-direction: column; gap: 10px; }
+.controls:empty { display: none; }
+.foot { margin: auto 0 0; padding-top: 6px; font-size: 11px; color: var(--muted); }
+
+/* Form bits */
+.field { display: flex; align-items: center; height: 44px; border-radius: 12px; background: #fff; box-shadow: 0 0 0 1px var(--line) inset; padding: 0 12px; font: 500 15px/1 "IBM Plex Mono", monospace; }
+.field:focus-within { box-shadow: 0 0 0 2px var(--teal) inset; }
+.field input { flex: 1; min-width: 0; border: 0; outline: 0; background: none; font: inherit; color: inherit; padding: 0; height: 100%; }
+.field span { color: var(--muted); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { appearance: none; border: 0; cursor: pointer; min-height: 36px; padding: 6px 12px; border-radius: 999px; background: #fff; color: var(--ink); font: 500 13px/1.2 "IBM Plex Mono", monospace; box-shadow: 0 0 0 1px var(--line) inset; text-align: left; }
+.chip:hover { box-shadow: 0 0 0 1px rgba(31,36,54,.35) inset; }
+.chip[aria-pressed="true"], .chip[aria-checked="true"] { background: var(--ink); color: var(--paper); box-shadow: none; }
+
+/* Bottom bar (same look as the About) */
+.bar { position: absolute; left: 0; right: 0; bottom: 0; height: 64px; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 0 16px; pointer-events: none; }
+.bar > * { pointer-events: auto; }
+.btn {
+  appearance: none; border: 0; cursor: pointer; height: 38px; min-width: 38px; padding: 0 14px; border-radius: 999px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  font: 500 13px/1 "IBM Plex Mono", ui-monospace, monospace; color: var(--ink); text-decoration: none; white-space: nowrap;
+  background: rgba(255,253,248,.78);
+  box-shadow: 0 1px 0 rgba(255,255,255,.7) inset, 0 1px 2px rgba(31,36,54,.12), 0 6px 18px -8px rgba(31,36,54,.35);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  transition: transform .16s ease, background-color .16s ease, opacity .2s ease;
+}
+.btn:hover { background: #fffdf8; }
+.btn:active { transform: scale(.96); }
+.btn:disabled { opacity: .35; cursor: default; transform: none; }
+.btn:focus-visible, .chip:focus-visible, .dots button:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+.btn svg { width: 18px; height: 18px; }
+.btn--icon { padding: 0; width: 38px; }
+.btn--primary { background: var(--ink); color: var(--paper); }
+.btn--primary:hover { background: #2b3249; }
+.btn--big { height: 46px; padding: 0 20px; font-size: 14px; }
+.btn[hidden] { display: none; }
+.dots { display: flex; gap: 2px; padding: 0 4px; }
+.dots button { appearance: none; border: 0; background: none; cursor: pointer; width: 18px; height: 28px; padding: 0; display: grid; place-items: center; border-radius: 6px; }
+.dots button::after { content: ""; width: 7px; height: 7px; border-radius: 99px; background: rgba(31,36,54,.25); transition: width .25s cubic-bezier(.2,.8,.2,1), background-color .25s ease; }
+.dots button[aria-current="true"]::after { width: 16px; background: var(--ink); }
+.dots button[data-done="true"]::after { background: rgba(31,36,54,.55); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Narrow (phones and the ~580px site frame): 3D on top, panel below, bar last. The stage grows to fit (about 3/4). */
+.stage.narrow { aspect-ratio: auto; display: flex; flex-direction: column; }
+.stage.narrow .view { position: relative; inset: auto; aspect-ratio: 4 / 3; flex: none; }
+.stage.narrow .panel { position: relative; inset: auto; width: auto; margin: -14px 12px 0; padding: 16px; overflow: visible; background: rgba(255,253,248,.9); }
+.stage.narrow .bar { position: relative; height: 60px; }
+.stage.narrow .title { font-size: 21px; }
+
+/* Capture mode (?capture): no controls, for the mp4. ?bare also hides the panel, for preview.webp */
+.bare .panel { display: none; }
+.stage.bare { border-radius: 0; }
+.capture .bar { display: none; }
+.capture .panel { max-height: calc(100% - 32px); }
+
+@media (max-width: 419px) { .bar { gap: 6px; } .dots button { width: 14px; } .btn { padding: 0 11px; } .btn--again .lbl { display: none; } .btn--again { width: 38px; padding: 0; } }
+@media (prefers-reduced-motion: reduce) { .btn, .dots button::after { transition: none; } .fade { animation: none; } }
+.capture .panel, .capture .btn { -webkit-backdrop-filter: none; backdrop-filter: none; }
