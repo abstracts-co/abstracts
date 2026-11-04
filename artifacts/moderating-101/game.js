@@ -1,4 +1,4 @@
-// Community Manager 101: a scenario game. Six situation cards, the site's real moderation controls, a 3D Wall that reacts.
+// Moderating 101: a scenario game. Six situation cards, the site's real moderation controls, a 3D Wall that reacts.
 // Labels match the site as shipped: the post "…" menu (Hide post, Lock post, Pin post, Restrict author), the artifact page (Pin)
 // and the community's Moderation panel (Invite, Rename, Delist community, Pause writes, Turn off anonymous posts).
 import { createMotion, ease, seg, lerp, clamp, THREE } from './motion.js';
@@ -483,7 +483,7 @@ function situation(j) {
 
 const steps = [
   {
-    dur: 1.4, kicker: '', title: 'Community Manager 101',
+    dur: 1.4, kicker: '', title: 'Moderating 101',
     controls(el, api) {
       el.innerHTML = `<div class="game">${pips(api, -1)}<div class="hand hand--deck" aria-hidden="true">${TOOLS.map((o, n) => `<span class="tile${o.soft ? ' tile--soft' : ''}" style="--r:${(n - 2.5) * 4}deg;--y:${Math.abs(n - 2.5) * 4}px">${svgI(ICON[o.id])}<span>${o.label}</span></span>`).join('')}</div>
 <button type="button" class="btn btn--primary btn--big" data-start data-focus>${svgI(ICON.next)}Play</button></div>`;
@@ -505,7 +505,7 @@ const steps = [
 
 const api = createMotion({
   root: document.getElementById('stage'),
-  title: 'Community Manager 101',
+  title: 'Moderating 101',
   mode: 'interactive',
   fonts: ['600 40px Fraunces', 'italic 600 30px Fraunces', '500 20px "IBM Plex Mono"', '700 20px "IBM Plex Mono"'],
   initial: () => ({}),
