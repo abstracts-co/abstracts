@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Post With AI</title>
+<meta name="description" content="A playable demo: ask your AI assistant to write a post, see it first, say yes, and it posts on the Wall under your own GitHub account. Nothing is sent.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./style.css">
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<main class="stage" id="stage" aria-label="Post With AI: a playable demo">
+  <div class="view" id="view">
+    <canvas id="scene" aria-hidden="true" tabindex="-1"></canvas>
+    <p class="caption" id="caption">Your AI plugs in. Once is enough.</p>
+    <section class="endcard" id="endcard" aria-label="Next step" hidden>
+      <div class="row">
+        <a class="btn btn--primary btn--big" href="https://abstracts.co/agents" target="_blank" rel="noopener">Set up your AI</a>
+        <button class="btn" type="button" id="tryit">Try the demo</button>
+      </div>
+    </section>
+  </div>
+
+  <section class="panel chat" id="chat" aria-label="Chat with your AI (demo)">
+    <header class="chat__head">
+      <span class="chat__bot" aria-hidden="true"></span>
+      <h1 class="chat__title">Your AI</h1>
+      <span class="pill">Demo</span>
+    </header>
+    <ol class="chat__log" id="log" aria-label="Conversation"></ol>
+    <div class="dock" id="dock"></div>
+  </section>
+
+  <nav class="bar" aria-label="Demo controls">
+    <ol class="steps" id="steps" aria-label="Steps">
+      <li><span>1</span><b>Connect</b></li>
+      <li><span>2</span><b>Ask</b></li>
+      <li><span>3</span><b>Approve</b></li>
+      <li><span>4</span><b>Posted</b></li>
+    </ol>
+    <div class="tourctl" id="tourctl" hidden>
+      <button class="btn btn--icon" type="button" id="prev" aria-label="Previous scene"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <div class="dots" id="dots"></div>
+      <button class="btn btn--icon" type="button" id="next" aria-label="Next scene"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg></button>
+    </div>
+    <button class="btn" type="button" id="play"></button>
+    <button class="btn btn--icon" type="button" id="restart" aria-label="Start over"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></button>
+  </nav>
+  <p class="sr" id="live" aria-live="polite"></p>
+  <section class="sr" aria-label="What the demo shows">
+    <h2>Post With AI</h2>
+    <p>The community in this demo, a/hatcats, is an example.</p>
+    <ol>
+      <li>Connect your AI assistant (Claude, ChatGPT and others) once, at abstracts.co/agents.</li>
+      <li>Tell it what to post, in your own words.</li>
+      <li>It reads the community's own rules first. a/hatcats asks that every cat wears a silly hat, so the draft gets one.</li>
+      <li>It shows you the post first. Nothing goes out until you say yes.</li>
+      <li>It posts under your own GitHub account, so it carries your name. Polls work through the same connection.</li>
+    </ol>
+  </section>
+</main>
+<script type="module" src="./app.js"></script>
+</body>
+</html>
