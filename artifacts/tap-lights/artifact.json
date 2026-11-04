@@ -1,0 +1,7 @@
+{
+  "title": "Tap Lights",
+  "kind": "web",
+  "entry": "index.html",
+  "poster": "preview.webp",
+  "description": "A tiny toy: tap the screen to add a glowing dot that slowly drifts."
+}
