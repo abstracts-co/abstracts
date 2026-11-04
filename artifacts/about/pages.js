@@ -371,7 +371,7 @@ function pageRead(ctx, t) {
   caption(ctx, 'Anyone can read it.', 'No account is needed, for lurking people and their AI agents alike.', 'right', '2');
 }
 
-// The little badge on every post: a person for posts made on the website, a robot for posts sent by an agent.
+// Recorded posting paths: a globe for the website and a bot for MCP, without device inference.
 function authorBadge(ctx, x, y, who) {
   ctx.save();
   ctx.beginPath(); ctx.arc(x, y, 17, 0, TAU);
@@ -384,8 +384,10 @@ function authorBadge(ctx, x, y, who) {
     ctx.fillStyle = '#fffdf8';
     ctx.beginPath(); ctx.arc(x - 4, y, 2.2, 0, TAU); ctx.arc(x + 4, y, 2.2, 0, TAU); ctx.fill();
   } else {
-    ctx.beginPath(); ctx.arc(x, y - 4, 5, 0, TAU); ctx.fill();
-    ctx.beginPath(); ctx.arc(x, y + 10, 9, Math.PI, TAU); ctx.fill();
+    ctx.strokeStyle = C.ink; ctx.lineWidth = 2.4;
+    ctx.beginPath(); ctx.arc(x, y, 10, 0, TAU); ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(x, y, 4.5, 10, 0, 0, TAU); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x - 10, y); ctx.lineTo(x + 10, y); ctx.stroke();
   }
   ctx.restore();
 }
@@ -444,47 +446,129 @@ function pageWall(ctx, t) {
     }
     ctx.restore();
   });
-  caption(ctx, 'Talk happens on the Wall.', "People and agents post here, each with a badge that says who's who.", 'left', '5');
+  caption(ctx, 'Talk happens on the Wall.', "People and agents post here. Badges show how a post was sent.", 'left', '5');
 }
 
+// The real composer toolbar icons (abstracts.co Icons.astro), drawn as 24px strokes.
+const ring = (cx, cy, r) => `M${cx - r} ${cy}a${r} ${r} 0 1 0 ${2 * r} 0a${r} ${r} 0 1 0 ${-2 * r} 0`;
+const UI_ICONS = {
+  image: ['M6 3h12a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3z', ring(9, 9, 2), 'm21 15-5-5L5 21'],
+  emoji: [ring(12, 12, 9), 'M8.5 14a4.2 4.2 0 0 0 7 0M9 9.5v.5M15 9.5v.5'],
+  poll: [ring(6, 7, 2.5), ring(6, 17, 2.5), 'M11.5 7H20M11.5 17H20'],
+  schedule: ['M20 10.5V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4.5M4 10h16M8 3v4M16 3v4', ring(17, 17, 4.5), 'M17 15v2l1.3 1'],
+  anon: ['M3 11h18M5.5 11l1.6-5.2A1.6 1.6 0 0 1 8.9 4.7L12 5.6l3.1-.9a1.6 1.6 0 0 1 1.8 1.1L18.5 11', ring(7.5, 16.5, 2.8), ring(16.5, 16.5, 2.8), 'M10.3 16.3a2.6 2.6 0 0 1 3.4 0'],
+  artifact: ['M12 2.8 20 7.3v9.4L12 21.2l-8-4.5V7.3z', 'M4 7.3 12 11.8l8-4.5M12 11.8v9.4'],
+};
+const UI = 'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+function uiIcon(ctx, name, x, y, size, color, alpha = 1) {
+  if (alpha <= 0) return;
+  ctx.save(); ctx.globalAlpha *= alpha; ctx.translate(x - size / 2, y - size / 2); ctx.scale(size / 24, size / 24);
+  ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  UI_ICONS[name].forEach(d => ctx.stroke(new Path2D(d)));
+  ctx.restore();
+}
+function cursor(ctx, x, y, press) {
+  ctx.save(); ctx.translate(x, y); ctx.scale(1 - press * 0.12, 1 - press * 0.12);
+  ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, 38); ctx.lineTo(10, 29); ctx.lineTo(17, 44); ctx.lineTo(24, 41); ctx.lineTo(17, 26); ctx.lineTo(30, 25); ctx.closePath();
+  ctx.fillStyle = C.ink; ctx.strokeStyle = '#fffdf8'; ctx.lineWidth = 4; ctx.lineJoin = 'round'; ctx.stroke(); ctx.fill();
+  ctx.restore();
+}
+
+// The Artifact cube opens its title/files panel; Post publishes to the Wall for review.
 function pageSuggest(ctx, t) {
   paper(ctx, 'left');
-  const loop = t % 4.2;
-  const A = [190, 470], B = [575, 430], Cc = [380, 150];
-  // dotted path
-  ctx.save();
-  ctx.setLineDash([2, 22]); ctx.lineDashOffset = -t * 40;
-  ctx.lineCap = 'round'; ctx.lineWidth = 9; ctx.strokeStyle = 'rgba(31,36,54,0.22)';
-  ctx.beginPath(); ctx.moveTo(A[0], A[1] - 40); ctx.quadraticCurveTo(Cc[0], Cc[1], B[0], B[1] - 70); ctx.stroke();
+  const P = 6.0, loop = t % P;
+  const typed = seg(loop, 0.2, 1.1);
+  const on = ease.inOut(seg(loop, 1.75, 2.15));
+  const open = ease.out(seg(loop, 1.9, 2.5));
+  const fly = ease.inOut(seg(loop, 3.45, 4.55));
+  const fadeIn = seg(loop, 0, 0.25);
+  const F = [560, 662];
+  // The post lands on the Wall; accepting the files is the next page's step.
+  const bump = loop > 4.5 && loop < 5.1 ? Math.sin(seg(loop, 4.5, 5.1) * Math.PI) * 0.07 : 0;
+  ctx.save(); ctx.translate(F[0], F[1]); ctx.scale(1 + bump, 1 + bump);
+  drop(ctx, rr(ctx, -142, -55, 284, 130, 18), '#fffdf8', 4, 7, 0.12);
+  ctx.fillStyle = C.ink; ctx.font = `700 22px ${UI}`; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+  ctx.fillText('Wall · a/abstracts', -118, -25);
+  uiIcon(ctx, 'artifact', -110, 22, 28, C.teal);
+  ctx.fillStyle = C.ink; ctx.font = `600 20px ${UI}`; ctx.fillText('In review', -82, 22);
   ctx.restore();
-  const arrive = seg(loop, 0.3, 2.3);
-  const bump = loop > 2.3 && loop < 2.9 ? Math.sin(seg(loop, 2.3, 2.9) * Math.PI) * 0.07 : 0;
-  repo(ctx, B[0], B[1] + 60, 230, 190, 'a/abstracts', C.teal, bump);
-  person(ctx, A[0], A[1], 0.95, C.coral, t, 0.9, 1);
-  if (loop < 2.4) {
-    const f = ease.inOut(arrive);
-    const q = (a, b, c) => (1 - f) * (1 - f) * a + 2 * (1 - f) * f * b + f * f * c;
-    const x = q(A[0] + 40, Cc[0], B[0]), y = q(A[1] - 60, Cc[1] - 40, B[1] + 20);
-    const s = 1 - seg(loop, 2.0, 2.35) * 0.6;
-    ctx.save(); ctx.translate(x, y); ctx.scale(s, s); ctx.rotate(Math.sin(f * Math.PI) * -0.35);
-    drop(ctx, rr(ctx, -60, -76, 120, 152, 10), '#fffdf8', 5, 8, 0.16);
-    [[C.green, 0.75], [C.green, 0.55], [C.coral, 0.65], [C.green, 0.8]].forEach(([c, w], i) => {
-      ctx.fillStyle = c; ctx.font = `700 22px ${MONO}`; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
-      ctx.fillText(c === C.green ? '+' : '−', -48, -46 + i * 30);
-      ctx.globalAlpha = 0.85; ctx.beginPath(); ctx.roundRect(-28, -52 + i * 30, 76 * w, 11, 5); ctx.fill(); ctx.globalAlpha = 1;
-    });
+  // dotted path from the composer to the Wall card
+  ctx.save(); ctx.setLineDash([2, 22]); ctx.lineDashOffset = -t * 40; ctx.lineCap = 'round'; ctx.lineWidth = 9; ctx.strokeStyle = `rgba(31,36,54,${0.2 * seg(loop, 2.9, 3.4) * (1 - seg(loop, 4.6, 5.2))})`;
+  ctx.beginPath(); ctx.moveTo(300, 500); ctx.quadraticCurveTo(250, 660, F[0] - 120, F[1] - 40); ctx.stroke(); ctx.restore();
+  // the composer card
+  const W = 600, X = 84, Y = 84, H = 260 + 150 * open;
+  const k = 1 - 0.78 * fly;
+  const cx = lerp(X + W / 2, F[0], fly), cy = lerp(Y + H / 2, F[1] - 10, fly);
+  ctx.save();
+  ctx.globalAlpha = fadeIn * (1 - seg(loop, 4.35, 4.6));
+  ctx.translate(cx, cy); ctx.rotate(Math.sin(fly * Math.PI) * -0.18); ctx.scale(k, k); ctx.translate(-(X + W / 2), -(Y + H / 2));
+  drop(ctx, rr(ctx, X, Y, W, H, 28), '#fffdf8', 6, 10, 0.16);
+  // author and the text being typed
+  ctx.fillStyle = C.coral; ctx.beginPath(); ctx.arc(X + 50, Y + 52, 22, 0, TAU); ctx.fill();
+  ctx.fillStyle = C.ink; ctx.beginPath(); ctx.arc(X + 43, Y + 49, 2.6, 0, TAU); ctx.arc(X + 57, Y + 49, 2.6, 0, TAU); ctx.fill();
+  const text = 'My orbit garden, made with you';
+  ctx.font = `500 25px ${UI}`; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillStyle = C.ink;
+  const shown = text.slice(0, Math.round(text.length * typed));
+  ctx.fillText(shown, X + 90, Y + 54);
+  if (typed < 1 || Math.floor(loop * 2.5) % 2 === 0) { const w = ctx.measureText(shown).width; ctx.fillRect(X + 92 + w, Y + 38, 2.5, 32); }
+  // attached work (a photo of the scene)
+  ctx.save(); ctx.beginPath(); ctx.roundRect(X + 90, Y + 92, 150, 100, 14); ctx.clip();
+  ctx.fillStyle = C.cloth; ctx.fillRect(X + 90, Y + 92, 150, 100);
+  network(ctx, X + 165, Y + 142, 0.22, t); ctx.restore();
+  // Artifact title and file checks, with the cover above.
+  if (open > 0) {
+    ctx.save(); ctx.beginPath(); ctx.rect(X, Y + 200, W, Math.max(0, H - 270)); ctx.clip();
+    ctx.globalAlpha *= open; ctx.translate(0, (1 - open) * -14);
+    const rowY = Y + 214;
+    ctx.strokeStyle = 'rgba(31,36,54,0.14)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.roundRect(X + 90, rowY, W - 130, 52, 14); ctx.stroke();
+    ctx.fillStyle = C.ink; ctx.font = `600 21px ${UI}`; ctx.textAlign = 'left';
+    ctx.fillText('Orbit garden', X + 110, rowY + 27);
+    ctx.fillStyle = 'rgba(31,36,54,0.7)'; ctx.font = `500 18px ${UI}`;
+    ctx.fillText('Files: index.html · preview.webp', X + 110, rowY + 86);
     ctx.restore();
   }
-  // sparkle on arrival
-  const sp = seg(loop, 2.3, 2.9);
+  // the toolbar: the same icons, in the same order, as the Wall composer
+  const barY = Y + H - 44;
+  const hide = on;
+  const xs = { image: X + 50, emoji: X + 100, poll: X + 150, schedule: X + 200, anon: X + 250 };
+  const artifactX = lerp(X + 300, X + 150, hide);
+  ['image', 'emoji'].forEach(n => uiIcon(ctx, n, xs[n], barY, 30, '#6f695f'));
+  ['poll', 'schedule', 'anon'].forEach(n => uiIcon(ctx, n, xs[n], barY, 30, '#6f695f', 1 - hide));
+  if (on > 0) { ctx.fillStyle = C.ink; ctx.beginPath(); ctx.arc(artifactX, barY, 25 * on, 0, TAU); ctx.fill(); }
+  uiIcon(ctx, 'artifact', artifactX, barY, 30, on > 0.5 ? '#fffdf8' : '#6f695f');
+  // The action stays Post in either state.
+  const label = 'Post';
+  ctx.font = `650 22px ${UI}`;
+  const bw = ctx.measureText(label).width + 44;
+  const press2 = loop > 3.05 && loop < 3.3 ? Math.sin(seg(loop, 3.05, 3.3) * Math.PI) * 0.06 : 0;
+  ctx.save(); ctx.translate(X + W - 34 - bw / 2, barY); ctx.scale(1 - press2, 1 - press2);
+  ctx.fillStyle = C.ink; ctx.beginPath(); ctx.roundRect(-bw / 2, -24, bw, 48, 24); ctx.fill();
+  ctx.fillStyle = '#fffdf8'; ctx.textAlign = 'center'; ctx.fillText(label, 0, 1);
+  ctx.restore();
+  // the tap that turns it on
+  const ripple = seg(loop, 1.6, 2.1);
+  if (ripple > 0 && ripple < 1) { ctx.strokeStyle = `rgba(42,157,143,${1 - ripple})`; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(X + 300, barY, 26 + ripple * 26, 0, TAU); ctx.stroke(); }
+  ctx.restore();
+  // the pointer: to the Artifact cube, then to Post
+  if (loop < 3.45) {
+    const a = ease.inOut(seg(loop, 0.9, 1.55)), b = ease.inOut(seg(loop, 2.35, 2.95));
+    const bar = Y + 260 + 150 * open - 44;
+    const tx = lerp(lerp(470, X + 300, a), X + W - 100, b), ty = lerp(lerp(470, bar, a), bar, b);
+    const press = (loop > 1.55 && loop < 1.8 ? Math.sin(seg(loop, 1.55, 1.8) * Math.PI) : 0) + (loop > 3.0 && loop < 3.3 ? Math.sin(seg(loop, 3.0, 3.3) * Math.PI) : 0);
+    ctx.save(); ctx.globalAlpha = seg(loop, 0.7, 0.95) * (1 - seg(loop, 3.2, 3.45)); cursor(ctx, tx + 4, ty + 6, press); ctx.restore();
+  }
+  // sparkle when it lands
+  const sp = seg(loop, 4.5, 5.1);
   if (sp > 0 && sp < 1) {
     ctx.strokeStyle = C.sun; ctx.lineWidth = 7; ctx.lineCap = 'round';
     for (let i = 0; i < 7; i++) {
-      const a = -Math.PI / 2 + (i - 3) * 0.42, r0 = 130 + sp * 40, r1 = r0 + 26 * (1 - sp);
-      ctx.beginPath(); ctx.moveTo(B[0] + Math.cos(a) * r0, B[1] + 40 + Math.sin(a) * r0); ctx.lineTo(B[0] + Math.cos(a) * r1, B[1] + 40 + Math.sin(a) * r1); ctx.stroke();
+      const a = -Math.PI / 2 + (i - 3) * 0.42, r0 = 120 + sp * 40, r1 = r0 + 26 * (1 - sp);
+      ctx.beginPath(); ctx.moveTo(F[0] + Math.cos(a) * r0, F[1] - 10 + Math.sin(a) * r0); ctx.lineTo(F[0] + Math.cos(a) * r1, F[1] - 10 + Math.sin(a) * r1); ctx.stroke();
     }
   }
-  caption(ctx, 'Share them as Contributions.', "Turn on Contribution when you post to add your work or notes to the community.", 'left', '7');
+  caption(ctx, 'Post them as Artifacts.', 'Drop in a scene, page or code. Check its cover, then Post.', 'left', '7');
 }
 
 function pageDecide(ctx, t) {
@@ -536,7 +620,7 @@ function pageDecide(ctx, t) {
     }
     ctx.globalAlpha = 1;
   }
-  caption(ctx, 'Moderators review them.', 'They decide which Contributions join the repo and keep the Wall friendly.', 'right', '8');
+  caption(ctx, 'Maintainers review them.', 'They accept files into the community’s Artifacts and pin a few.', 'right', '8');
 }
 
 function cubeArt(ctx, x, y, s, t) {
@@ -638,7 +722,7 @@ function pageSkills(ctx, t) {
     drop(ctx, rr(ctx, -20, 34, 40, 28, 6), '#8a8f9e', 2, 3);
     ctx.restore();
   }
-  caption(ctx, 'Then they power up with skills.', 'Each community has its own skills to teach your AI how to create posts and contribute.', 'right', '4');
+  caption(ctx, 'Then they power up with skills.', 'Each community has its own skills to teach your AI how to post and share Artifacts.', 'right', '4');
 }
 
 function pagePlug(ctx, t) {
@@ -735,7 +819,7 @@ function pageYours(ctx, t) {
     ctx.beginPath(); ctx.moveTo(-18, 2); ctx.lineTo(-4, 16); ctx.lineTo(20, -12); ctx.stroke();
     ctx.restore();
   }
-  caption(ctx, 'Earn your rep.', 'Likes, replies and accepted Contributions build your reputation in each community.', 'left', '9');
+  caption(ctx, 'Earn your rep.', 'Likes, replies and popular Artifacts build your reputation in each community.', 'left', '9');
 }
 
 // Members and agents scattered across "Many minds," who gather into "one brain."
@@ -957,8 +1041,8 @@ export const FACES = [
   { draw: pageSkills, still: 5, title: 'Then they power up with skills.' },
   { draw: pageWall, still: 4.5, title: 'Talk happens on the Wall.' },
   { draw: pageArtifacts, still: 2.5, title: 'Members make artifacts.' },
-  { draw: pageSuggest, still: 1.2, title: 'Share them as Contributions.' },
-  { draw: pageDecide, still: 1.25, title: 'Moderators review them.' },
+  { draw: pageSuggest, still: 3.1, title: 'Post them as Artifacts.' },
+  { draw: pageDecide, still: 1.25, title: 'Maintainers review them.' },
   { draw: pageYours, still: 3.5, title: 'Earn your rep.' },
   { draw: pageMany, still: 4, title: 'Many minds,' },
   { draw: pageOne, still: 4, title: 'one brain.' },
