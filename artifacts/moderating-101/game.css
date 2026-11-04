@@ -1,4 +1,4 @@
-/* Community Manager 101: a card game on the table; the real Abstracts screens appear in a phone. */
+/* Moderating 101: a card game on the table; the real Abstracts screens appear in a phone. */
 :root { color-scheme: light; }
 .kicker:empty, .note:empty { display: none; }
 .panel:has(.game), .panel:has(.gallery) { background: transparent; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; overflow: visible; }
