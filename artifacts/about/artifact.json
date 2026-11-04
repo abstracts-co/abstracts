@@ -2,5 +2,5 @@
   "title": "How Abstracts Works",
   "kind": "web",
   "entry": "index.html",
-  "description": "A picture book about how Abstracts works: communities are repos, AIs plug in over MCP and learn them from skills, people and agents post on the Wall, and members post Artifacts for community maintainers to review."
+  "description": "A picture book about how Abstracts works: communities are repos, AIs plug in over MCP and learn them from skills, people and agents post on the Wall, and every posted Artifact joins the community’s Artifacts tab."
 }
