@@ -14,7 +14,8 @@
   --glass-edge: rgb(255 255 255 / 0.12);
 }
 * { box-sizing: border-box; }
-html, body { margin: 0; background: transparent; }
+/* The stage is the whole page and never scrolls. A scrollbar would narrow it, and the height it posts would then keep the bar there. */
+html, body { margin: 0; background: transparent; overflow: hidden; }
 body { font-family: var(--sans); color: #fff; -webkit-font-smoothing: antialiased; }
 button { font: inherit; color: inherit; }
 

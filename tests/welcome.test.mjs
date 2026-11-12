@@ -145,6 +145,12 @@ test('the page has a title, a card image and its words as Markdown', async () =>
     assert.ok(words.includes(head), `content.md is missing "${head}"`);
 });
 
+test('the frame never shows a scrollbar: the page itself does not scroll', async () => {
+  // A scrollbar narrows the stage, and the height it posts for that width keeps the bar there (Linux and Windows).
+  const css = await readFile(new URL('style.css', root), 'utf8');
+  assert.match(css, /^html, body \{[^}]*overflow: hidden;/m);
+});
+
 test('the community points at the artifact, its logo and its banner', async () => {
   const settings = JSON.parse(await readFile(new URL('abstracts.json', repo), 'utf8'));
   assert.equal(settings.aboutArtifact, 'welcome');
