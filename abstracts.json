@@ -5,11 +5,10 @@
   "rules": [],
   "roles": [],
   "categories": [],
-  "aboutArtifact": "about",
+  "aboutArtifact": "welcome",
   "avatar": "logo.png",
   "cover": "cover.webp",
   "pinnedArtifacts": [
-    "about",
-    "moderating-101"
+    "welcome"
   ]
 }

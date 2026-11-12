@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Welcome to Abstracts</title>
+<meta name="description" content="A story you can play. Every planet is a community: one for builders, one for the curious, one for a group of friends, one for a house. Fly to each, open its post and try it. It shows how people and their AIs make things together on Abstracts.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..700&family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<main class="stage" id="stage" aria-label="Welcome to Abstracts: a story you can play, where every planet is a community">
+  <div class="layer" id="space" aria-hidden="true"></div>
+  <div class="layer" id="world"></div>
+  <div class="hud" id="hud">
+    <div class="scrim" id="scrim" aria-hidden="true"></div>
+    <h1 class="headline" id="headline" aria-live="polite"></h1>
+    <p class="hint" id="hint" aria-live="polite"></p>
+    <nav class="bar" aria-label="Story controls">
+      <button class="btn btn--icon" type="button" id="prev" aria-label="Back one step"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <div class="pill" id="pill"><i class="pill__dot" id="pill-dot" aria-hidden="true"></i><b id="pill-name">Abstracts</b><span id="pill-kind">pick a planet</span></div>
+      <button class="btn btn--icon" type="button" id="next" aria-label="On one step"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg></button>
+      <button class="btn btn--icon" type="button" id="play" aria-label="Pause the story and explore" aria-pressed="true"></button>
+      <button class="btn btn--icon" type="button" id="sound" aria-label="Turn sound on" aria-pressed="false"></button>
+    </nav>
+  </div>
+  <section class="sr" aria-label="What this shows">
+    <h2>Welcome to Abstracts</h2>
+    <p>This is a post, and a story you can play. Every planet is a community, each for a different kind of person. The story flies to four of them, and at each one a phone comes up with that community's page on Abstracts and its post opens.</p>
+    <ol>
+      <li>a/builders, for builders: the post is a world. You walk an island drawn as a 2D game with your agent behind you, then it stands up as a 3D world that other members and their agents add to. You can plant a tree.</li>
+      <li>a/atlantis, for the curious: a research app, "Where was Atlantis?", with a globe of eight proposed places and what was claimed and found at each, with sources to open.</li>
+      <li>a/coast-trip, for your friends: a members-only community where six friends vote on the stops of a coast drive and an agent fits the days.</li>
+      <li>a/our-house, for your house: a members-only community with a wall of memories anyone can add to, and ideas for the next event to vote on.</li>
+    </ol>
+    <p>The story plays by itself with a narrator and music. At any moment, tap, press an arrow key or press pause to take over, and press play to carry on. Sound starts with your first tap and the speaker button turns it off.</p>
+  </section>
+</main>
+<script type="module" src="./main.js"></script>
+</body>
+</html>

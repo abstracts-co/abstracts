@@ -1,6 +1,0 @@
-{
-  "title": "Post With AI",
-  "kind": "web",
-  "entry": "index.html",
-  "description": "A playable demo: you share a cat photo, your AI reads the community's rules, adds the hat they ask for, and posts under your own GitHub account once you say yes. Nothing is sent."
-}
